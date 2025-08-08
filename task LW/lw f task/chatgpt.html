@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gemini API Chat</title>
+</head>
+<body>
+  <h2>Ask Gemini AI (Google)</h2>
+  <input type="text" id="prompt" placeholder="Type your question..." size="50" />
+  <button onclick="askGemini()">Ask</button>
+  <pre id="output" style="white-space: pre-wrap;"></pre>
+
+  <script>
+    async function askGemini() {
+      const prompt = document.getElementById("prompt").value;
+      const apiKey = "AIzaSyCVKxDV0kMRBUCMOCWmIc6Lh3roCDz-v0E"; // Your Google AI Studio key
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+
+      const payload = {
+        contents: [{ parts: [{ text: prompt }] }]
+      };
+
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (data.candidates && data.candidates.length > 0) {
+          const text = data.candidates[0].content.parts[0].text;
+          document.getElementById("output").textContent = text;
+        } else {
+          document.getElementById("output").textContent = "⚠️ No response received.";
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById("output").textContent = "❌ Error calling Gemini API.";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Camera Stream</title>
+</head>
+<body>
+  <h2>📷 Live Camera Stream using JavaScript</h2>
+
+  <video id="liveStream" width="640" height="480" autoplay playsinline></video>
+  <br>
+  <button onclick="startCamera()">Start Camera</button>
+  <button onclick="stopCamera()">Stop Camera</button>
+
+  <script>
+    let stream;
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        document.getElementById('liveStream').srcObject = stream;
+      } catch (err) {
+        console.error("Error accessing camera: ", err);
+        alert("Camera access denied or not supported.");
+      }
+    }
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        document.getElementById('liveStream').srcObject = null;
+      }
+    }
+  </script>
+</body>
+</html>

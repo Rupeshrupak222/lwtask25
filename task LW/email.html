@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Send Email with JavaScript (EmailJS)</title>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      emailjs.init("Z3CMgsavg_qAGSdKB"); // ✅ Your EmailJS Public Key
+    });
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      padding: 40px;
+      max-width: 500px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 12px;
+      width: 100%;
+      background-color: #007BFF;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📨 Contact Us</h2>
+
+  <input type="text" id="name" placeholder="Your Name" required>
+  <input type="email" id="email" placeholder="Your Email" required>
+  <textarea id="message" rows="5" placeholder="Your Message" required></textarea>
+  <button onclick="sendEmail()">Send Email</button>
+
+  <script>
+    function sendEmail() {
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!name || !email || !message) {
+        alert("❗ Please fill out all fields.");
+        return;
+      }
+
+      const params = {
+        from_name: name,
+        from_email: email,
+        message: message,
+      };
+
+      emailjs.send("service_mi21a8c", "template_lxs7qn5", params)
+        .then(function(response) {
+          alert("✅ Email sent successfully!");
+          document.getElementById("name").value = "";
+          document.getElementById("email").value = "";
+          document.getElementById("message").value = "";
+        }, function(error) {
+          console.error("Error sending email:", error);
+          alert("❌ Failed to send email. Check console for details.");
+        });
+    }
+  </script>
+
+</body>
+</html>

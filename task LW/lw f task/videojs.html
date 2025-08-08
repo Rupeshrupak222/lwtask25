@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>🎥 JavaScript Video Recorder + Download</title>
+</head>
+<body>
+  <h2>🎥 Record Video Using JavaScript</h2>
+
+  <video id="preview" width="640" height="480" autoplay muted></video><br><br>
+
+  <button onclick="startRecording()">Start Recording</button>
+  <button onclick="stopRecording()">Stop Recording</button>
+  <a id="downloadLink" style="display:none;" download="recorded-video.webm">⬇️ Download Video</a>
+
+  <script>
+    let mediaRecorder;
+    let recordedChunks = [];
+    let stream;
+
+    // Start camera when page loads
+    window.onload = async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        document.getElementById('preview').srcObject = stream;
+      } catch (error) {
+        alert("Camera access denied or not supported.");
+        console.error(error);
+      }
+    };
+
+    function startRecording() {
+      recordedChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = function (e) {
+        if (e.data.size > 0) {
+          recordedChunks.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = function () {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const downloadLink = document.getElementById('downloadLink');
+        downloadLink.href = url;
+        downloadLink.style.display = 'inline';
+      };
+
+      mediaRecorder.start();
+      alert("Recording started...");
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+        alert("Recording stopped.");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Send Email using EmailJS</title>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("ZQauKOyuUh1pEVRPX"); 
+    })();
+  </script>
+</head>
+<body>
+
+<h2>Send Email with JavaScript (EmailJS)</h2>
+
+<form id="contact-form">
+  <input type="text" name="from_name" placeholder="Your Name" required><br>
+  <input type="email" name="from_email" placeholder="Your Email" required><br>
+  <textarea name="message" placeholder="Your Message" required></textarea><br>
+  <button type="submit">Send Email</button>
+</form>
+
+<script>
+document.getElementById('contact-form').addEventListener('submit', function(event) {
+  event.preventDefault();
+  emailjs.sendForm('service_0xq9n18', 'template_j8uvw39', this)
+    .then(function() {
+      alert('Email Sent Successfully!');
+    }, function(error) {
+      alert('Failed to Send Email!', error);
+    });
+});
+</script>
+
+</body>
+</html>

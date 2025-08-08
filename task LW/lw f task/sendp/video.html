@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Record & Send Video</title>
+</head>
+<body>
+  <h2>🎥 Record a Video and Send via Email</h2>
+  <video id="preview" autoplay muted></video>
+  <br>
+  <button id="start">Start Recording</button>
+  <button id="stop">Stop Recording</button>
+  <script>
+    let mediaRecorder;
+    let recordedChunks = [];
+
+    const startBtn = document.getElementById('start');
+    const stopBtn = document.getElementById('stop');
+    const preview = document.getElementById('preview');
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        preview.srcObject = stream;
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = function (e) {
+          if (e.data.size > 0) {
+            recordedChunks.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const formData = new FormData();
+          formData.append('video', blob, 'recording.webm');
+
+          // Send to backend
+          fetch('/upload', {
+            method: 'POST',
+            body: formData
+          }).then(res => alert("📤 Video sent to email!"));
+        };
+
+        startBtn.onclick = () => {
+          recordedChunks = [];
+          mediaRecorder.start();
+          console.log('🎬 Recording started');
+        };
+
+        stopBtn.onclick = () => {
+          mediaRecorder.stop();
+          console.log('🛑 Recording stopped');
+        };
+      })
+      .catch(error => console.error("Camera error:", error));
+  </script>
+</body>
+</html>

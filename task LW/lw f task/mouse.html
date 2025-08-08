@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Drag and Drop Div</title>
+  <style>
+    #draggable {
+      width: 200px;
+      height: 200px;
+      background-color: #007acc;
+      color: white;
+      line-height: 200px;
+      text-align: center;
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      border-radius: 15px;
+      cursor: grab;
+      font-family: Arial;
+      font-size: 18px;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="draggable">🚀 Drag Me!</div>
+
+  <script>
+    const box = document.getElementById('draggable');
+
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    box.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      offsetX = e.clientX - box.offsetLeft;
+      offsetY = e.clientY - box.offsetTop;
+      box.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        box.style.left = `${e.clientX - offsetX}px`;
+        box.style.top = `${e.clientY - offsetY}px`;
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      box.style.cursor = 'grab';
+    });
+  </script>
+
+</body>
+</html>

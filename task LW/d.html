@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Camera Photo Sender</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+    }
+    video, canvas, img {
+      border: 2px solid #333;
+      margin-top: 10px;
+    }
+    input, button {
+      margin-top: 10px;
+      padding: 8px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h2>📷 Take Photo and Send to Gmail</h2>
+
+  <button id="startCamera">🎥 Start Camera</button>
+  <button id="stopCamera">🛑 Stop Camera</button><br>
+
+  <video id="video" width="320" height="240" autoplay style="display:none;"></video><br>
+
+  <button id="clickPhoto">📸 Click Photo</button><br>
+
+  <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+  <img id="photo" src="" width="320" height="240" /><br>
+
+  <input type="email" id="userEmail" placeholder="Enter your email" /><br>
+  <button onclick="sendPhoto()">📧 Send to Gmail</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    let stream = null;
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const photo = document.getElementById("photo");
+
+    emailjs.init("rrupa2289@gmail.COM"); 
+    document.getElementById("startCamera").onclick = async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.style.display = "block";
+      } catch (err) {
+        alert("Failed to access camera: " + err.message);
+      }
+    };
+
+
+    document.getElementById("stopCamera").onclick = () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        video.style.display = "none";
+      }
+    };
+
+   
+    document.getElementById("clickPhoto").onclick = () => {
+      canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = canvas.toDataURL("image/png");
+      photo.src = imageData;
+    };
+
+  
+    function sendPhoto() {
+      const userEmail = document.getElementById("userEmail").value;
+      if (!userEmail) {
+        alert("rrupa2289@gmai.com");
+        return;
+      }
+
+      const imageData = canvas.toDataURL("image/png");
+
+      const templateParams = {
+        to_email: userEmail,
+        from_name: "Camera App",
+        message: "Here is your captured photo!",
+        photo: imageData
+      };
+
+      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", templateParams)
+        .then(response => {
+          alert("✅ Photo sent successfully to " + userEmail);
+        }, error => {
+          alert("❌ Error sending email: " + error.text);
+        });
+    }
+  </script>
+</body>
+</html>

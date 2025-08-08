@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Photo Capture and Email Sender</title>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      emailjs.init("Z3CMgsavg_qAGSdKB"); // ✅ Your EmailJS Public Key
+    });
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 30px;
+      background-color: #f5f5f5;
+    }
+    video, canvas {
+      border: 2px solid #333;
+      border-radius: 8px;
+      margin: 10px auto;
+      display: block;
+    }
+    input, textarea {
+      margin: 10px auto;
+      padding: 10px;
+      width: 90%;
+      max-width: 400px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      display: block;
+    }
+    button {
+      margin: 10px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📸 Capture Photo and Send via Email</h2>
+
+  <!-- Webcam Stream -->
+  <video id="video" width="320" height="240" autoplay></video>
+  <button id="snap">📷 Capture Photo</button>
+  <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+
+  <!-- Form Inputs -->
+  <input type="email" id="to_email" placeholder="Enter recipient email" required>
+  <textarea id="message" rows="4" placeholder="Enter your message like SMS..." required></textarea>
+  <button id="send">📤 Send Photo via Email</button>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    let capturedImage = "";
+
+    // Start Webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        alert("Webcam error: " + err);
+      });
+
+    // Capture Photo
+    document.getElementById('snap').addEventListener('click', () => {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      capturedImage = canvas.toDataURL("image/png");
+      alert("✅ Photo Captured!");
+    });
+
+    // Send Email
+    document.getElementById('send').addEventListener('click', () => {
+      const to_email = document.getElementById("to_email").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!to_email || !message || !capturedImage) {
+        alert("❗ Please fill all fields and capture a photo.");
+        return;
+      }
+
+      const params = {
+        to_email: to_email,
+        message: message,
+        image_base64: capturedImage
+      };
+
+      emailjs.send("service_mi21a8c", "template_lxs7qn5", params)
+        .then(() => {
+          alert("✅ Email sent successfully!");
+          document.getElementById("to_email").value = "";
+          document.getElementById("message").value = "";
+        })
+        .catch(err => {
+          console.error("Error:", err);
+          alert("❌ Failed to send email.");
+        });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Speech to Text</title>
+</head>
+<body>
+  <h2>🎙️ Speak Something…</h2>
+  <button onclick="startRecognition()">Start Listening</button>
+  <p id="output"></p>
+
+  <script>
+    // Check for browser support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Sorry, your browser doesn't support Speech Recognition.");
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';  // You can change to "hi-IN" for Hindi, etc.
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    function startRecognition() {
+      document.getElementById("output").innerText = "Listening...";
+      recognition.start();
+    }
+
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById("output").innerText = `You said: ${transcript}`;
+    };
+
+    recognition.onerror = function(event) {
+      document.getElementById("output").innerText = `Error: ${event.error}`;
+    };
+  </script>
+</body>
+</html>

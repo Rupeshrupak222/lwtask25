@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Record & Email Video</title>
+</head>
+<body>
+  <h2>🎥 Record Video with Timer and Send via Email</h2>
+
+  <video id="preview" width="320" height="240" autoplay muted></video>
+  <br><br>
+
+  <p><strong>Recording Time:</strong> <span id="timer">00:00</span></p>
+
+  <button onclick="startRecording()">🎬 Start Recording</button>
+  <button onclick="stopRecording()">🛑 Stop Recording</button>
+  <button onclick="sendEmail()">📧 Send via Email</button>
+
+  <form id="videoForm" style="display:none;">
+    <input type="hidden" name="video_data" id="videoDataField" />
+  </form>
+
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    emailjs.init("ZQauKOyuUh1pEVRPX"); // ✅ Replace with your EmailJS Public Key
+
+    let mediaRecorder;
+    let recordedChunks = [];
+    let timerInterval;
+    let seconds = 0;
+
+    const timerElement = document.getElementById("timer");
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        document.getElementById('preview').srcObject = stream;
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = function(e) {
+          if (e.data.size > 0) {
+            recordedChunks.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstop = function() {
+          let blob = new Blob(recordedChunks, { type: 'video/webm' });
+          let reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onloadend = function () {
+            let base64data = reader.result;
+            document.getElementById('videoDataField').value = base64data;
+            alert("🎞️ Video ready to send!");
+          };
+        };
+      });
+
+    function startRecording() {
+      recordedChunks = [];
+      seconds = 0;
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        seconds++;
+        updateTimerDisplay();
+      }, 1000);
+
+      mediaRecorder.start();
+      alert("Recording started...");
+    }
+
+    function stopRecording() {
+      clearInterval(timerInterval);
+      mediaRecorder.stop();
+      alert("Recording stopped.");
+    }
+
+    function updateTimerDisplay() {
+      let mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+      let secs = (seconds % 60).toString().padStart(2, '0');
+      timerElement.textContent = `${mins}:${secs}`;
+    }
+
+    function sendEmail() {
+      emailjs.sendForm('service_u5b3e99', 'template_4v45n4z', '#videoForm')
+        .then(function(response) {
+          alert("✅ Email sent successfully!");
+        }, function(error) {
+          alert("❌ Failed to send email: " + JSON.stringify(error));
+        });
+    }
+  </script>
+</body>
+</html>

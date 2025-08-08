@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Webcam Photo Capture</title>
+  <style>
+    video, canvas {
+      width: 320px;
+      height: 240px;
+      border: 2px solid #333;
+      margin: 10px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h2>📸 Webcam Photo Capture & Download</h2>
+
+  <video id="video" autoplay></video><br/>
+  <button onclick="takePhoto()">Capture Photo</button>
+  <button id="downloadBtn" disabled>Download Photo</button><br/>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    // Access the webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(error => {
+        console.error("Error accessing webcam: ", error);
+        alert("Could not access webcam.");
+      });
+
+    // Capture photo and enable download
+    function takePhoto() {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = canvas.toDataURL('image/png');
+
+      // Enable and set download link
+      downloadBtn.disabled = false;
+      downloadBtn.onclick = () => {
+        const link = document.createElement('a');
+        link.href = imageData;
+        link.download = 'captured_photo.png';
+        link.click();
+      };
+    }
+  </script>
+</body>
+</html>

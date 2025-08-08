@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Send Email using JavaScript (EmailJS)</title>
+</head>
+<body>
+  <h2>📧 Send Email Using JavaScript</h2>
+
+  <form id="contact-form">
+    <label>Name:</label><br/>
+    <input type="text" name="from_name" required /><br/><br/>
+
+    <label>Email:</label><br/>
+    <input type="email" name="reply_to" required /><br/><br/>
+
+    <label>Message:</label><br/>
+    <textarea name="message" rows="5" required></textarea><br/><br/>
+
+    <button type="submit">Send Email</button>
+  </form>
+
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    // Initialize EmailJS with your Public Key
+    (function(){
+      emailjs.init("ZQauKOyuUh1pEVRPX"); // ✅ Replace with your EmailJS Public Key
+    })();
+
+    // Handle form submission
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      emailjs.sendForm('service_u5b3e99', 'template_4v45n4z', this)
+        .then(function(response) {
+          alert('✅ Email sent successfully!');
+          console.log(response);
+        }, function(error) {
+          alert('❌ Failed to send email: ' + JSON.stringify(error));
+        });
+    });
+  </script>
+</body>
+</html>

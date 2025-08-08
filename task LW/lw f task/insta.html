@@ -1,0 +1,34 @@
+<video id="preview" autoplay muted></video>
+<button onclick="startRecording()">Start Recording</button>
+<button onclick="stopRecording()">Stop Recording</button>
+<a id="download" style="display:none">Download Video</a>
+
+<script>
+let mediaRecorder;
+let recordedChunks = [];
+
+async function startRecording() {
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  document.getElementById("preview").srcObject = stream;
+
+  mediaRecorder = new MediaRecorder(stream);
+  mediaRecorder.ondataavailable = event => recordedChunks.push(event.data);
+  
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(recordedChunks, { type: "video/webm" });
+    const url = URL.createObjectURL(blob);
+    const downloadLink = document.getElementById("download");
+    downloadLink.href = url;
+    downloadLink.download = "video.webm";
+    downloadLink.style.display = "block";
+    downloadLink.innerText = "Download & Upload to Instagram";
+  };
+
+  recordedChunks = [];
+  mediaRecorder.start();
+}
+
+function stopRecording() {
+  mediaRecorder.stop();
+}
+</script>

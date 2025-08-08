@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Record & Send Video</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    video { width: 100%; max-width: 500px; }
+    input, button { margin: 10px 0; padding: 10px; width: 100%; max-width: 500px; }
+  </style>
+</head>
+<body>
+  <h2>🎥 Record & Send Video</h2>
+  <video id="preview" autoplay muted></video><br>
+  
+  <input id="emailOrPhone" placeholder="Enter email or phone number"><br>
+  <button id="startBtn">Start Recording</button>
+  <button id="stopBtn" disabled>Stop & Send</button>
+
+  <script>
+    let mediaRecorder, recordedChunks = [];
+
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const preview = document.getElementById('preview');
+    const input = document.getElementById('emailOrPhone');
+
+    startBtn.onclick = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      preview.srcObject = stream;
+
+      recordedChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = e => e.data.size > 0 && recordedChunks.push(e.data);
+
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const formData = new FormData();
+        formData.append('video', blob, 'video.webm');
+        formData.append('receiver', input.value);
+
+        const res = await fetch('http://localhost:3000/send', {
+          method: 'POST',
+          body: formData
+        });
+
+        const msg = await res.text();
+        alert(msg);
+        preview.srcObject.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+    };
+
+    stopBtn.onclick = () => {
+      mediaRecorder.stop();
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    };
+  </script>
+</body>
+</html>
